@@ -1,0 +1,315 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1rem 0}
+.header{text-align:center;margin-bottom:1.5rem}
+.header h1{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.header p{font-size:14px;color:var(--color-text-secondary);margin-top:4px}
+.progress-bar{display:flex;gap:6px;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
+.pip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-secondary);transition:all .2s}
+.pip.active{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.pip.done{background:var(--color-background-success);color:var(--color-text-success);border-color:var(--color-border-success)}
+.pip-icon{font-size:14px;width:16px;height:16px;display:flex;align-items:center;justify-content:center}
+.stage{display:none;animation:fadeIn .35s ease}
+.stage.visible{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:16px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card-sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem}
+.icon-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ib-blue{background:var(--color-background-info)}
+.ib-purple{background:#EEEDFE}
+.ib-green{background:var(--color-background-success)}
+.ib-amber{background:#FAEEDA}
+.ib-teal{background:#E1F5EE}
+.ib-red{background:#FCEBEB}
+.code-block{background:var(--color-background-tertiary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:1rem;font-family:var(--font-mono);font-size:15px;color:var(--color-text-primary);line-height:1.7}
+.token-table{width:100%;border-collapse:collapse;font-size:13px}
+.token-table th{padding:8px 12px;text-align:left;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.token-table td{padding:8px 12px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.token-table tr:last-child td{border-bottom:none}
+.tok-id{background:#EEEDFE;color:#3C3489;border-radius:4px;padding:2px 8px;font-family:var(--font-mono);font-size:12px;font-weight:500}
+.tok-op{background:#FAEEDA;color:#633806;border-radius:4px;padding:2px 8px;font-family:var(--font-mono);font-size:12px;font-weight:500}
+.tok-num{background:#E1F5EE;color:#085041;border-radius:4px;padding:2px 8px;font-family:var(--font-mono);font-size:12px;font-weight:500}
+.tac-line{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;margin-bottom:6px;font-family:var(--font-mono);font-size:14px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);transition:all .3s}
+.tac-line.hl{background:var(--color-background-info);border-color:var(--color-border-info);color:var(--color-text-primary)}
+.tac-step{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tac-line .ts1{background:#EEEDFE;color:#3C3489}
+.tac-line .ts2{background:#E1F5EE;color:#085041}
+.tac-line .ts3{background:#FAEEDA;color:#633806}
+.tac-line .ts4{background:var(--color-background-info);color:var(--color-text-info)}
+.mc-line{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;margin-bottom:6px;font-family:var(--font-mono);font-size:13px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary)}
+.mc-mnem{color:#185FA5;font-weight:500;min-width:40px}
+.mc-ops{color:var(--color-text-primary)}
+.mc-comment{color:var(--color-text-secondary);font-size:12px;margin-left:auto}
+.mc-ldf .mc-mnem{color:#3C3489}
+.mc-mul .mc-mnem{color:#633806}
+.mc-add .mc-mnem{color:#085041}
+.mc-st  .mc-mnem{color:#A32D2D}
+.opt-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:13px}
+.opt-before{background:var(--color-background-secondary);padding:6px 12px;border-radius:6px;font-family:var(--font-mono);font-size:13px;color:var(--color-text-secondary);text-decoration:line-through;flex:1}
+.opt-arrow{color:var(--color-text-secondary)}
+.opt-after{background:var(--color-background-success);color:var(--color-text-success);padding:6px 12px;border-radius:6px;font-family:var(--font-mono);font-size:13px;flex:1}
+.controls{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:1.25rem}
+.btn{padding:8px 20px;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);transition:all .15s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.btn-primary:hover{opacity:.85}
+.btn-auto{background:var(--color-background-secondary)}
+.btn-auto.playing{background:#FAEEDA;color:#633806;border-color:#FAC775}
+.stage-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--color-background-info);color:var(--color-text-info);font-size:12px;font-weight:500;margin-right:4px}
+.tooltip-wrap{position:relative;display:inline-flex;align-items:center;margin-left:6px}
+.tip-icon{width:16px;height:16px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;justify-content:center;cursor:default}
+.tooltip{display:none;position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 12px;font-size:12px;color:var(--color-text-secondary);width:200px;z-index:10;line-height:1.5;box-shadow:none}
+.tooltip-wrap:hover .tooltip{display:block}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:540px){.two-col{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+  <h2 class="sr-only">Compiler Visualizer — step-by-step translation of i = i * 60 + j + 2 into machine code</h2>
+  <div class="header">
+    <h1>Compiler Design Visualizer</h1>
+    <p>Step-by-step translation of source code to machine instructions</p>
+  </div>
+
+  <div class="progress-bar" id="progress"></div>
+
+  <div id="stages">
+
+    <div class="stage" id="s0">
+      <div class="card">
+        <div class="card-title"><span class="icon-badge ib-blue">✎</span><span class="stage-num">1</span>Source Input</div>
+        <div class="card-sub">The original expression as written by the programmer</div>
+        <div class="code-block">i = i * 60 + j + 2</div>
+        <div style="margin-top:1rem;font-size:13px;color:var(--color-text-secondary);display:flex;align-items:flex-start;gap:6px">
+          <span style="color:var(--color-text-info)">ℹ</span>
+          This assignment statement reads: compute <code style="font-size:12px;background:var(--color-background-secondary);padding:2px 5px;border-radius:4px">i * 60 + j + 2</code> and store the result back in <code style="font-size:12px;background:var(--color-background-secondary);padding:2px 5px;border-radius:4px">i</code>.
+        </div>
+      </div>
+    </div>
+
+    <div class="stage" id="s1">
+      <div class="card">
+        <div class="card-title"><span class="icon-badge ib-purple">⬡</span><span class="stage-num">2</span>Lexical Analysis — Tokenization
+          <div class="tooltip-wrap"><span class="tip-icon">?</span><div class="tooltip">The scanner breaks the raw source text into a flat stream of typed tokens, mapping variable names to symbolic IDs.</div></div>
+        </div>
+        <div class="card-sub">Variables renamed to canonical identifiers; each symbol classified by type</div>
+        <div class="code-block" style="margin-bottom:1rem">id1 = id1 * 60 + id2 + 2</div>
+        <table class="token-table">
+          <thead><tr><th>Token</th><th>Lexeme</th><th>Type</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tok-id">id1</span></td><td>i</td><td>Identifier</td></tr>
+            <tr><td><span class="tok-op">=</span></td><td>=</td><td>Assignment operator</td></tr>
+            <tr><td><span class="tok-id">id1</span></td><td>i</td><td>Identifier</td></tr>
+            <tr><td><span class="tok-op">*</span></td><td>*</td><td>Arithmetic operator</td></tr>
+            <tr><td><span class="tok-num">60</span></td><td>60</td><td>Integer constant</td></tr>
+            <tr><td><span class="tok-op">+</span></td><td>+</td><td>Arithmetic operator</td></tr>
+            <tr><td><span class="tok-id">id2</span></td><td>j</td><td>Identifier</td></tr>
+            <tr><td><span class="tok-op">+</span></td><td>+</td><td>Arithmetic operator</td></tr>
+            <tr><td><span class="tok-num">2</span></td><td>2</td><td>Integer constant</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="stage" id="s2">
+      <div class="card">
+        <div class="card-title"><span class="icon-badge" style="background:#FAEEDA">🌳</span><span class="stage-num">3</span>Syntax Analysis — Parse Tree
+          <div class="tooltip-wrap"><span class="tip-icon">?</span><div class="tooltip">The parser applies grammar rules and operator precedence (* before +) to build a hierarchical tree from the flat token stream.</div></div>
+        </div>
+        <div class="card-sub">Operator precedence: <code style="font-size:12px;background:var(--color-background-secondary);padding:2px 5px;border-radius:4px">*</code> binds tighter than <code style="font-size:12px;background:var(--color-background-secondary);padding:2px 5px;border-radius:4px">+</code> — multiplication is resolved first</div>
+        <svg width="100%" viewBox="0 0 680 360" role="img">
+          <title>Parse tree for id1 = id1 * 60 + id2 + 2</title>
+          <desc>Tree with = at root, id1 on left, and nested + operators on right following operator precedence</desc>
+          <defs>
+            <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <!-- root = -->
+          <g>
+            <rect x="310" y="20" width="60" height="36" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+            <text x="340" y="38" text-anchor="middle" dominant-baseline="central" font-family="var(--font-mono)" font-size="18" font-weight="500" fill="#3C3489">=</text>
+          </g>
+          <!-- left: id1 -->
+          <line x1="325" y1="56" x2="185" y2="110" stroke="#AFA9EC" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g>
+            <rect x="140" y="112" width="68" height="32" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+            <text x="174" y="128" text-anchor="middle" dominant-baseline="central" font-family="var(--font-mono)" font-size="13" font-weight="500" fill="#3C3489">id1</text>
+          </g>
+          <!-- right: + (outer) -->
+          <line x1="355" y1="56" x2="450" y2="110" stroke="#AFA9EC" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g>
+            <rect x="422" y="112" width="56" height="32" rx="8" fill="#FAEEDA" stroke="#FAC775" stroke-width="0.5"/>
+            <text x="450" y="128" text-anchor="middle" dominant-baseline="central" font-family="var(--font-mono)" font-size="18" font-weight="500" fill="#633806">+</text>
+          </g>
+          <!-- + right child: 2 -->
+          <line x1="468" y1="144" x2="540" y2="195" stroke="#FAC775" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g>
+            <rect x="510" y="196" width="60" height="32" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+            <text x="540" y="212" text-anchor="middle" dominant-baseline="central" font-family="var(--font-mono)" font-size="14" font-weight="500" fill="#085041">2</text>
+          </g>
+          <!-- + left child: + (inner) -->
+          <line x1="435" y1="144" x2="370" y2="195" stroke="#FAC775" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g>
+            <rect x="344" y="196" width="56" height="32" rx="8" fill="#FAEEDA" stroke="#FAC775" stroke-width="0.5"/>
+            <text x="372" y="212" text-anchor="middle" dominant-baseline="central" font-family="var(--font-mono)" font-size="18" font-weight="500" fill="#633806">+</text>
+          </g>
+          <!-- inner + right child: id2 -->
+          <line x1="390" y1="228" x2="460" y2="278" stroke="#FAC775" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g>
+            <rect x="426" y="280" width="68" height="32" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+            <text x="460" y="296" text-anchor="middle" dominant-baseline="central" font-family="var(--font-mono)" font-size="13" font-weight="500" fill="#3C3489">id2</text>
+          </g>
+          <!-- inner + left child: * -->
+          <line x1="356" y1="228" x2="284" y2="278" stroke="#FAC775" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g>
+            <rect x="258" y="280" width="56" height="32" rx="8" fill="#FAEEDA" stroke="#FAC775" stroke-width="0.5"/>
+            <text x="286" y="296" text-anchor="middle" dominant-baseline="central" font-family="var(--font-mono)" font-size="18" font-weight="500" fill="#633806">*</text>
+          </g>
+          <!-- * left: id1 -->
+          <line x1="270" y1="312" x2="200" y2="326" stroke="#FAC775" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g>
+            <rect x="130" y="326" width="68" height="30" rx="8" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+            <text x="164" y="341" text-anchor="middle" dominant-baseline="central" font-family="var(--font-mono)" font-size="13" font-weight="500" fill="#3C3489">id1</text>
+          </g>
+          <!-- * right: 60 -->
+          <line x1="302" y1="312" x2="360" y2="326" stroke="#FAC775" stroke-width="1" marker-end="url(#arrow2)"/>
+          <g>
+            <rect x="330" y="326" width="60" height="30" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+            <text x="360" y="341" text-anchor="middle" dominant-baseline="central" font-family="var(--font-mono)" font-size="14" font-weight="500" fill="#085041">60</text>
+          </g>
+          <!-- legend -->
+          <rect x="30" y="280" width="10" height="10" rx="2" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="0.5"/>
+          <text x="46" y="290" font-family="var(--font-sans)" font-size="11" fill="var(--color-text-secondary)">Identifier</text>
+          <rect x="30" y="298" width="10" height="10" rx="2" fill="#FAEEDA" stroke="#FAC775" stroke-width="0.5"/>
+          <text x="46" y="308" font-family="var(--font-sans)" font-size="11" fill="var(--color-text-secondary)">Operator</text>
+          <rect x="30" y="316" width="10" height="10" rx="2" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+          <text x="46" y="326" font-family="var(--font-sans)" font-size="11" fill="var(--color-text-secondary)">Constant</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="stage" id="s3">
+      <div class="card">
+        <div class="card-title"><span class="icon-badge ib-teal">⚙</span><span class="stage-num">4</span>Intermediate Code — Three-Address Code
+          <div class="tooltip-wrap"><span class="tip-icon">?</span><div class="tooltip">The tree is linearized into a sequence of simple assignments, each with at most one operator and using compiler-generated temporaries (t1, t2…).</div></div>
+        </div>
+        <div class="card-sub">Each line has exactly one operation. Temporaries hold intermediate values. Click a line to highlight it.</div>
+        <div id="tac-container">
+          <div class="tac-line" id="tl0" onclick="hlTac(0)"><span class="tac-step ts1">1</span><span>t1 = id1 * 60</span><span style="margin-left:auto;font-size:11px;color:var(--color-text-secondary)">Multiply first (precedence)</span></div>
+          <div class="tac-line" id="tl1" onclick="hlTac(1)"><span class="tac-step ts2">2</span><span>t2 = t1 + id2</span><span style="margin-left:auto;font-size:11px;color:var(--color-text-secondary)">Add j</span></div>
+          <div class="tac-line" id="tl2" onclick="hlTac(2)"><span class="tac-step ts3">3</span><span>t3 = t2 + 2</span><span style="margin-left:auto;font-size:11px;color:var(--color-text-secondary)">Add constant 2</span></div>
+          <div class="tac-line" id="tl3" onclick="hlTac(3)"><span class="tac-step ts4">4</span><span>id1 = t3</span><span style="margin-left:auto;font-size:11px;color:var(--color-text-secondary)">Store back to i</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage" id="s4">
+      <div class="card">
+        <div class="card-title"><span class="icon-badge ib-amber">✦</span><span class="stage-num">5</span>Code Optimization
+          <div class="tooltip-wrap"><span class="tip-icon">?</span><div class="tooltip">The optimizer spots opportunities: constant folding (compute constants at compile time), dead code elimination, and instruction combining.</div></div>
+        </div>
+        <div class="card-sub">Constant folding and instruction reduction applied</div>
+        <div class="two-col" style="margin-bottom:1rem">
+          <div class="card" style="padding:.875rem">
+            <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Before</div>
+            <div style="font-family:var(--font-mono);font-size:13px;color:var(--color-text-primary);line-height:2">t1 = id1 * 60<br>t2 = t1 + id2<br>t3 = t2 + 2<br>id1 = t3</div>
+          </div>
+          <div class="card" style="padding:.875rem;border-color:var(--color-border-success);background:var(--color-background-success)">
+            <div style="font-size:12px;font-weight:500;color:var(--color-text-success);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">After (optimized)</div>
+            <div style="font-family:var(--font-mono);font-size:13px;color:var(--color-text-primary);line-height:2">t1 = id1 * 60<br>t1 = t1 + id2<br>t1 = t1 + 2<br>id1 = t1</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 14px;border:0.5px solid var(--color-border-tertiary)">
+          <strong style="color:var(--color-text-primary);font-weight:500">Optimization applied:</strong> Temporaries t2 and t3 collapsed into reuse of t1 — reducing register pressure and eliminating two assignments.
+        </div>
+      </div>
+    </div>
+
+    <div class="stage" id="s5">
+      <div class="card">
+        <div class="card-title"><span class="icon-badge" style="background:#FCEBEB">⬛</span><span class="stage-num">6</span>Target Code Generation — Machine Instructions
+          <div class="tooltip-wrap"><span class="tip-icon">?</span><div class="tooltip">The final phase emits actual CPU instructions. LDF loads a float into a register, MUL/ADD perform arithmetic in-register, and ST writes the result back to memory.</div></div>
+        </div>
+        <div class="card-sub">Assembly-level instructions for the target architecture. Hover each line for a description.</div>
+        <div id="mc-container">
+          <div class="mc-line mc-ldf" title="Load the value of variable i (id1) into floating-point register R1">
+            <span class="mc-mnem">LDF</span><span class="mc-ops">R1, id1</span><span class="mc-comment">; Load i → R1</span>
+          </div>
+          <div class="mc-line mc-mul" title="Multiply register R1 by the constant 60 in place">
+            <span class="mc-mnem">MUL</span><span class="mc-ops">R1, 60</span><span class="mc-comment">; R1 ← R1 × 60</span>
+          </div>
+          <div class="mc-line mc-add" title="Add the value of variable j (id2) to register R1">
+            <span class="mc-mnem">ADD</span><span class="mc-ops">R1, id2</span><span class="mc-comment">; R1 ← R1 + j</span>
+          </div>
+          <div class="mc-line mc-add" title="Add the integer constant 2 to register R1">
+            <span class="mc-mnem">ADD</span><span class="mc-ops">R1, 2</span><span class="mc-comment">; R1 ← R1 + 2</span>
+          </div>
+          <div class="mc-line mc-st" title="Store the value in R1 back into memory location for variable i (id1)">
+            <span class="mc-mnem">ST</span><span class="mc-ops">id1, R1</span><span class="mc-comment">; Store R1 → i</span>
+          </div>
+        </div>
+        <div style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="font-size:12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;border:0.5px solid var(--color-border-tertiary)"><span style="font-family:var(--font-mono);color:#185FA5;font-weight:500">LDF</span> — Load float from memory into register</div>
+          <div style="font-size:12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;border:0.5px solid var(--color-border-tertiary)"><span style="font-family:var(--font-mono);color:#633806;font-weight:500">MUL</span> — Multiply register by operand</div>
+          <div style="font-size:12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;border:0.5px solid var(--color-border-tertiary)"><span style="font-family:var(--font-mono);color:#085041;font-weight:500">ADD</span> — Add operand to register</div>
+          <div style="font-size:12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;border:0.5px solid var(--color-border-tertiary)"><span style="font-family:var(--font-mono);color:#A32D2D;font-weight:500">ST</span>  — Store register value to memory</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="btn-prev" onclick="go(-1)">← Prev</button>
+    <span id="step-label" style="font-size:13px;color:var(--color-text-secondary);min-width:80px;text-align:center"></span>
+    <button class="btn btn-primary" id="btn-next" onclick="go(1)">Next →</button>
+    <button class="btn btn-auto" id="btn-auto" onclick="toggleAuto()">▶ Auto</button>
+  </div>
+</div>
+
+<script>
+const stages=[
+  {id:'s0',label:'Input',icon:'✎'},
+  {id:'s1',label:'Lexical',icon:'⬡'},
+  {id:'s2',label:'Parse Tree',icon:'🌳'},
+  {id:'s3',label:'3-Addr Code',icon:'⚙'},
+  {id:'s4',label:'Optimize',icon:'✦'},
+  {id:'s5',label:'Machine Code',icon:'⬛'}
+];
+let cur=0,autoTimer=null;
+const pb=document.getElementById('progress');
+stages.forEach((s,i)=>{
+  const d=document.createElement('div');
+  d.className='pip';d.id='pip'+i;
+  d.innerHTML='<span class="pip-icon">'+s.icon+'</span>'+s.label;
+  d.onclick=()=>show(i);
+  pb.appendChild(d);
+});
+function show(n){
+  stages.forEach((s,i)=>{
+    document.getElementById(s.id).classList.toggle('visible',i===n);
+    const p=document.getElementById('pip'+i);
+    p.className='pip'+(i===n?' active':i<n?' done':'');
+  });
+  cur=n;
+  document.getElementById('btn-prev').disabled=n===0;
+  document.getElementById('btn-next').disabled=n===stages.length-1;
+  document.getElementById('step-label').textContent='Stage '+(n+1)+' / '+stages.length;
+}
+function go(d){show(Math.max(0,Math.min(stages.length-1,cur+d)));}
+function toggleAuto(){
+  const b=document.getElementById('btn-auto');
+  if(autoTimer){clearInterval(autoTimer);autoTimer=null;b.textContent='▶ Auto';b.classList.remove('playing');}
+  else{b.textContent='⏸ Stop';b.classList.add('playing');autoTimer=setInterval(()=>{if(cur<stages.length-1){go(1);}else{clearInterval(autoTimer);autoTimer=null;b.textContent='▶ Auto';b.classList.remove('playing');}},2400);}
+}
+let hlIdx=-1;
+function hlTac(i){
+  for(let j=0;j<4;j++)document.getElementById('tl'+j).classList.toggle('hl',j===i);
+  hlIdx=i;
+}
+show(0);
+</script>
